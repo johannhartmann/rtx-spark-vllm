@@ -1,0 +1,19 @@
+name: Offline profile tests
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  configuration:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Test configuration, integrity checks and stopped-service installation
+        run: python3 -m unittest discover -s tests -p test_vllm_configuration.py -v
+      - name: Check shell syntax
+        run: bash -n config/vllm-qwen38/install.sh config/vllm-qwen38/serve.sh

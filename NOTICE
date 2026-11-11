@@ -1,0 +1,14 @@
+This project was extracted from johannhartmann/asus-proart-p16-rtx-spark-linux.
+Original helper, configuration, documentation and test copyright notices are
+preserved under the MIT license in LICENSE. Git history is filtered to the
+extracted paths; the original repository's history is unchanged.
+
+config/vllm-qwen38/patches/0001-sm12x-nvfp4-and-bf16.patch derives from vLLM
+source and upstream changes. The base revision and source PR/commit references
+are recorded in config/vllm-qwen38/build-profile.json. Upstream vLLM's Apache
+License 2.0 text from that pinned revision is retained in
+licenses/vllm-Apache-2.0.txt. Existing upstream copyright/license notices apply
+when the patch is combined with the vLLM source.
+
+External wheels, model weights and runtime dependencies retain their own
+licenses; this source extraction does not redistribute those artifacts.
