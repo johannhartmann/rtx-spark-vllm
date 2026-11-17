@@ -51,7 +51,8 @@ class VllmConfigurationTests(unittest.TestCase):
         for key in ("VLLM_SPEC_METHOD", "VLLM_KERNEL_CONFIG", "VLLM_COMPILATION_CONFIG",
                     "VLLM_MAX_MODEL_LEN", "VLLM_MAX_NUM_SEQS", "VLLM_MAX_BATCHED_TOKENS",
                     "VLLM_KV_CACHE_BYTES", "VLLM_GPU_MEMORY_UTILIZATION",
-                    "VLLM_DRAFT_QUANTIZATION", "VLLM_NVFP4_LINEAR_CUTOFF",
+                    "VLLM_DRAFT_QUANTIZATION", "VLLM_DRAFT_SAMPLE_METHOD",
+                    "VLLM_NVFP4_LINEAR_CUTOFF",
                     "VLLM_NVFP4_SILU_CUTOFF", "VLLM_NVFP4_AUTOTUNE"):
             self.env.pop(key, None)
 
@@ -66,7 +67,8 @@ class VllmConfigurationTests(unittest.TestCase):
         self.assertEqual(command["runner"], "1")
         self.assertEqual(command["argv"][2], self.env["VLLM_TARGET_MODEL"])
         self.assertEqual(values["--speculative-config.model"], self.env["VLLM_DRAFT_MODEL"])
-        self.assertEqual(values["--speculative-config.num_speculative_tokens"], "7")
+        self.assertEqual(values["--speculative-config.num_speculative_tokens"], "8")
+        self.assertEqual(values["--speculative-config.draft_sample_method"], "probabilistic")
         self.assertEqual(max(graphs["decode_cudagraph_capture_request_sizes"]), 8)
         self.assertNotIn("max_cudagraph_capture_size", graphs)
         self.assertNotIn("fuse_act_quant", graphs.get("pass_config", {}))

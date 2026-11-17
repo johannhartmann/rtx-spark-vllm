@@ -5,8 +5,10 @@ including DFlash2/MTP launch profiles, SM12x Python backports, checkpoint
 preparation, configuration checks and a user systemd service.
 
 The [setup guide](docs/vllm-qwen38.md) documents dependencies, immutable input
-revisions, installation stages and qualification limits. Model startup, output
-correctness and serving throughput remain unvalidated by the recorded checks.
+revisions, installation stages and qualification limits. The
+[November 2026 performance record](docs/performance-2026-11-17.md) contains
+full-model output checks, matched decode measurements and remaining driver
+warnings on the P16.
 
 ## Setup
 

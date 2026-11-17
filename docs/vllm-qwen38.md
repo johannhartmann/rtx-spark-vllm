@@ -7,9 +7,9 @@ configuration; replacing the model path alone is not a supported migration.
 
 The service is installed stopped and disabled. Integrity checks read files in
 bounded CPU buffers; configuration/schema checks do not construct a model or
-create an inference engine. Successful model
-startup, output correctness and throughput still require a separately
-authorized runtime check.
+create an inference engine. The
+[P16 performance record](performance-2026-11-17.md) reports a separately
+measured full-model run.
 
 ## Pinned inputs
 
@@ -88,7 +88,7 @@ file. No stage writes kernel, firmware, boot or GPU power settings.
 
 ## Operating profiles
 
-The default uses DFlash2 with seven draft tokens and standard rejection
+The default uses DFlash2 with eight draft tokens and standard rejection
 sampling. Eligible draft linear layers use online FP8 quantization via
 `--speculative-config.quantization fp8_per_tensor`; the pinned source checkpoint
 remains BF16 on disk. This is draft-only: the Unsloth target retains its mixed
@@ -116,7 +116,8 @@ additional memory. CPU affinity selects this N1X machine's performance cores.
 
 Set `VLLM_SPEC_METHOD=mtp` for the checkpoint's built-in three-token MTP head.
 DFlash2 benefits depend on output predictability, context and concurrency;
-it is not assumed faster for every workload. Neither profile is benchmarked here.
+it is not assumed faster for every workload. The linked performance record
+benchmarks DFlash2 on three code prompts; MTP remains unmeasured.
 
 [`client-presets.json`](../config/vllm-qwen38/client-presets.json) supplies
 explicit HTTP-request settings for direct answers and reasoning. Merge one
@@ -175,13 +176,17 @@ candidate. It chooses
 the cutoff minimizing total latency across those equally weighted shapes,
 requiring at least a 3% gain over fixed W4A4. M=17 and 32 also exercise the
 W4A4 path. This is local component tuning, not an end-to-end workload or TPS
-benchmark. Full generation correctness and speculative acceptance still need
-a later model run.
+benchmark. The linked performance record separately measures full generation
+output and speculative acceptance.
 
-The DFlash drafter uses greedy sampling by default, matching the published
-Windows N1X code benchmark. `VLLM_DRAFT_SAMPLE_METHOD=probabilistic` selects
-probabilistic drafting. This changes the draft proposals, not the target
-model's requested sampling distribution.
+The DFlash drafter uses probabilistic sampling by default. On this P16, eight
+draft tokens and probabilistic sampling sustained the matched code workload
+above 40 decode tokens/s; seven draft tokens with greedy sampling did not.
+`VLLM_DRAFT_SAMPLE_METHOD=greedy` selects greedy drafting for comparison with
+the published Windows N1X recipe. Draft sampling changes proposals, not the
+target model's requested sampling distribution. See the
+[performance record](performance-2026-11-17.md) for per-prompt results and
+startup driver warnings.
 
 `$VLLM_CACHE_DIR/kernel-qualification.json` records results, timings, GPU UUID,
 selected cutoffs and software fingerprint. A matching successful report is

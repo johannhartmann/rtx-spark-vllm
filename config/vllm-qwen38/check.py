@@ -66,8 +66,8 @@ def check_command(command):
         if arg.startswith("--") and i + 1 < len(argv) and not argv[i + 1].startswith("--"):
             values[arg] = argv[i + 1]
     method = values["--speculative-config.method"]
-    if method == "dflash" and int(values["--speculative-config.num_speculative_tokens"]) != 7:
-        raise ValueError("This DFlash2 checkpoint requires seven draft tokens")
+    if method == "dflash" and int(values["--speculative-config.num_speculative_tokens"]) != 8:
+        raise ValueError("This profile uses eight DFlash2 draft tokens")
     if values.get("--speculative-config.quantization") not in (None, "fp8_per_tensor"):
         raise ValueError("Draft online FP8 uses fp8_per_tensor in this runtime")
     for flag in ("--max-model-len", "--max-num-seqs", "--max-num-batched-tokens", "--kv-cache-memory-bytes"):

@@ -28,8 +28,8 @@ export TOKENIZERS_PARALLELISM=false
 speculation=${VLLM_SPEC_METHOD:-dflash}
 case $speculation in
   dflash) draft_args=(--speculative-config.model "$VLLM_DRAFT_MODEL"
-      --speculative-config.num_speculative_tokens 7
-      --speculative-config.draft_sample_method "${VLLM_DRAFT_SAMPLE_METHOD:-greedy}"
+      --speculative-config.num_speculative_tokens 8
+      --speculative-config.draft_sample_method "${VLLM_DRAFT_SAMPLE_METHOD:-probabilistic}"
       --speculative-config.rejection_sample_method standard)
     case ${VLLM_DRAFT_QUANTIZATION:-fp8_per_tensor} in
       fp8_per_tensor) draft_args+=(--speculative-config.quantization fp8_per_tensor) ;;
