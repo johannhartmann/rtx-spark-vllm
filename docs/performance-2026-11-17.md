@@ -121,6 +121,43 @@ therefore not fully met. No Xid or GSP timeout was observed. The separate
 GPU trace above provides a device-side step duration; it must not be confused
 with the wall-step estimate.
 
+## Online NVFP4 weight-only drafter A/B
+
+On 2026-11-17, an isolated copy of the installed vLLM wheel was patched with
+[vLLM #67006](https://github.com/vllm-project/vllm/pull/67006) (downloaded PR
+patch SHA-256 `331e1c610ae67c0894796ce46dabed32ef3c35f6605fae9138f856e5868f5092`).
+The three code commits applied to the wheel copy; the fourth, a docstring-only
+change, was already present in the local code. The patched package was loaded
+through `PYTHONPATH`, leaving the installed wheel and service files untouched.
+The same pinned target and drafter, eight draft tokens, model settings, power
+profile, and benchmark script were used. The drafter's online quantization
+changed from `fp8_per_tensor` to `nvfp4_weight_only`. Because the existing
+global `nvfp4_dynamic` backend rejects an online W4A16 drafter, the candidate
+also set `linear_backend_per_quant.nvfp4_w4a16=marlin`. The first candidate
+start without that override failed before serving; the measured candidate
+started with Marlin for W4A16 and Dynamic NVFP4 for the target.
+
+| Arm | Pass 1 | Pass 2 | Pass 3 | Nine-request mean | Mean acceptance length |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Installed FP8-per-tensor drafter | 42.219 | 42.275 | 41.919 | **42.138 tok/s** | 5.092 |
+| #67006 NVFP4 weight-only drafter | 36.182 | 35.928 | 36.120 | **36.077 tok/s** | 4.524 |
+
+The NVFP4 candidate was **14.4% slower** on this workload. Its Go-prompt
+acceptance length fell from 4.876 to 3.909; the mean wall time per draft step
+changed from 120.2 to 124.1 ms. All 18 measured responses had 512 output
+tokens, a `length` finish, no reasoning text, and the prompt-specific topic
+markers. These checks are not a full quality evaluation. vLLM reported 21.68
+GiB model-load memory for the candidate versus 22.42 GiB for the earlier
+installed start, but unified-memory availability differed between starts.
+Three already-known `NV_ERR_NO_MEMORY` warnings appeared during candidate
+startup; none appeared during its measured requests, and there was no Xid or
+GSP error. The FP8-per-tensor service was restored after the A/B; one further
+three-prompt control pass measured 41.067 tok/s with the original acceptance
+lengths (5.340, 5.059, 4.876) and three valid responses. Raw responses,
+per-request metrics, candidate log, and the experimental launcher
+are under `/home/johann/p16/benchmarks/qwen38-27b-vllm/nvfp4-weight-only-20261117/`.
+The NVFP4 drafter is not selected for the maintained service.
+
 ## Reproduce
 
 Use the pinned checkpoint and native runtime from the [setup guide](vllm-qwen38.md).
