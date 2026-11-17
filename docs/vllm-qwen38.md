@@ -46,7 +46,13 @@ if [ ! -e "$config_dir/vllm-qwen38.env" ]; then
 fi
 ```
 
-Review that file before installation. Then run the stages in order:
+Review that file before installation. The installer preserves an existing
+environment file. For the qualified P16 profile, make sure its
+`VLLM_DRAFT_SAMPLE_METHOD` is `probabilistic`, matching
+`environment.example`; an older local value of `greedy` overrides the
+launcher's default and was slower in the recorded code benchmark.
+
+Then run the stages in order:
 
 ```sh
 bash config/vllm-qwen38/install.sh runtime
